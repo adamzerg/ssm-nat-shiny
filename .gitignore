@@ -1,9 +1,8 @@
+keys.json
 .RData
 .Rhistory
-keys.json
+.Rproj.user
 *.log
-cron-job/
-cicd/
-data/
-plot/
+delete/
+data/source/
 dp-leaflet-script/
