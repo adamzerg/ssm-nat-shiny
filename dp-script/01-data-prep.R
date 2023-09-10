@@ -18,8 +18,15 @@ library(rgeos)
 version <- 20220722
 locMaster <- read_csv(paste("data/source/location-master/location-master-",version,".csv", sep = ""))
 
+
+version2 <- "20220723185612"
+# "20220722170034"
+# "20220723120109"
+# "20220723185612"
+
 StartTimeStr <- "2022-07-22 09:00"
-EndTimeStr <- "2022-07-23 19:00"
+EndTimeStr <- as.POSIXct(version2,format="%Y%m%d%H%M%S","Asia/Taipei")
+
 versionSt <- as.POSIXct(StartTimeStr, "Asia/Taipei")
 versionEt <- as.POSIXct(EndTimeStr, "Asia/Taipei") - 1 # Avoid version ended given no result capture
 versionEt0 <- as.POSIXct(EndTimeStr, "Asia/Taipei")
@@ -34,9 +41,10 @@ versionEtStr <- str_remove_all(str_remove_all(toString(versionEt), "-"),":")
 
 
 
-
 filelist <- dir('data/source/aptmon', full.names=TRUE)
-tailfile <- tail(filelist, 1)
+# tailfile <- tail(filelist, 1)
+tailfile <- paste("data/source/aptmon/aptmon-",version2,".xlsx", sep = "")
+
 scrp <- data.frame()
   for (file in filelist) {
     filetimestr <- sub(".xlsx", "", sub(".*-", "", file))
@@ -126,9 +134,6 @@ station <- station %>%
 
 ### Supply for Location Master data
 set1 <- merge(station, locMaster)
-summary(set1)
-
-write_excel_csv(set1, "data/1-station.csv", "UTF-8")
 
 
 
@@ -136,16 +141,8 @@ write_excel_csv(set1, "data/1-station.csv", "UTF-8")
 
 
 ### Locate for booking data
-fileTwr <- data.frame()
-filelist2 <- dir('data/source/RNA010', full.names=TRUE)
-for (file2 in filelist2) {
-  filetimestr2 <- sub(".xlsx", "",sub(".*-", "", file2))
-  filetime2 <- strptime(filetimestr2,"%Y%m%d%H%M%S")
-  if(filetime2 %within% versionTi) {
-    fileTwr <- rbind(fileTwr,as.data.frame(file2))
-  }
-}
-file2 <- tail(fileTwr, 1) %>% toString
+
+file2 <- paste("data/source/RNA010/RNA010-",version2,".xlsx", sep = "")
 
 day1 <- as.Date(StartTimeStr)
 day2 <- as.Date(StartTimeStr)+1
@@ -220,8 +217,6 @@ booking <- pdf %>%
 
 ### Supply for Location Master data
 set2 <- merge(booking, locMaster)
-
-write_excel_csv(set2, "data/2-booking.csv", "UTF-8")
 # str(set2)
 
 
@@ -252,4 +247,11 @@ mdf <- mdf %>%
 
 throughput <- merge(mdf, locMaster)
 
-write_excel_csv(throughput, "data/3-throughput.csv", "UTF-8")
+
+
+st_out <- paste("data/1-station-",version2,".csv", sep = "")
+bk_out <- paste("data/2-booking-",version2,".csv", sep = "")
+tp_out <- paste("data/3-throughput-",version2,".csv", sep = "")
+write_excel_csv(set1, st_out)
+write_excel_csv(set2, bk_out)
+write_excel_csv(throughput, tp_out)
